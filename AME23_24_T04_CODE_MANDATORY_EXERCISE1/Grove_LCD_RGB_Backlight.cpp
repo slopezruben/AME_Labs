@@ -25,7 +25,6 @@ clear the display*/
 void Grove_LCD_RGB_Backlight::clear()
 {
     this->sendCommand(LCD_CLEARDISPLAY);        
-    wait_us(2000);         
 }
 
 
@@ -34,11 +33,9 @@ It writes the provided r, g, and b values to the registers for the red
 value, the green value, and the blue value respectively.*/
 void Grove_LCD_RGB_Backlight::setRGB(char r, char g, char b)
 {
-   
     this->setReg(RED_REG, r);
     this->setReg(GREEN_REG, g);
-    this->setReg(BLUE_REG, b);  
-    
+    this->setReg(BLUE_REG, b);     
 }
 
 /*This function is used to write to one of the registers for the backlight
@@ -64,7 +61,7 @@ void Grove_LCD_RGB_Backlight::print(char *str)
     {
             data[1] = *str;
             //TODO write the function to write in the screen//
-           
+            i2c.write(0x7c, data, 2);
             str++;
             
     }
@@ -76,18 +73,23 @@ void Grove_LCD_RGB_Backlight::write(char data1)
     char data[2];
     data[0]=0x40;
     data[1]=(data1 >>4)+0x30;
-   //TODO write the function to write in the screen//
+    //TODO write the function to write in the screen//
+    i2c.write(0x7c,data,2);
+
     data[1]=(data1&0x0f)+0x30;
     //TODO write the function to write in the screen//
+    i2c.write(0x7c,data,2);
+
 }
 
 void Grove_LCD_RGB_Backlight::writech(char data2)
 {
- char data[2];
- data[0]=0x40;
- data[1]=data2;
- //TODO write the function to write in the screen// 
-    
+    char data[2];
+    data[0]=0x40;
+    data[1]=data2;
+ 
+    //TODO write the function to write in the screen//
+    i2c.write(0x7c, data, 2);
 }
 
 /*This function sets where on the screen the text will be written next.  It 
@@ -108,6 +110,7 @@ void Grove_LCD_RGB_Backlight::locate(char col, char row)
     data[0] = 0x80;
     data[1] = col;
    //TODO write the function to write in the screen//
+   i2c.write(0x7c, data, 2);
 }
 
 /*This function sends an instruction to the LCD display using the
@@ -116,8 +119,7 @@ void Grove_LCD_RGB_Backlight::locate(char col, char row)
 void Grove_LCD_RGB_Backlight::sendCommand(char value)
 {
     char data[2] = {0x80, value};
-    printf("write resolution: %d\n", i2c.write(0x7c,data, 2));
-    ThisThread::sleep_for(2s);
+    i2c.write(0x7c,data, 2);
 }
 
 void Grove_LCD_RGB_Backlight::init() 
